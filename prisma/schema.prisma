@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Memorial {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  
+  // Subject Info
+  fullName    String
+  birthDate   String
+  deathDate   String
+  epitaph     String
+  
+  // Content
+  bio         String
+  mainImage   String
+  gallery     String // Store as JSON string since SQLite doesn't support JSON type natively in all versions, or use simple string
+  
+  // Blockchain Anchor
+  txid        String?  @unique
+  status      String   @default("DRAFT") // DRAFT, PENDING, ANCHORED
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

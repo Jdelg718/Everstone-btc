@@ -1,65 +1,108 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Search, ShieldCheck, Github } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
+  const [query, setQuery] = useState('');
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      router.push(`/view/${query.trim()}`);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 -z-10" />
+      <div className="absolute top-0 left-0 w-full h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800/30 via-transparent to-transparent -z-10 opacity-70" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="text-center max-w-2xl w-full"
+      >
+        {/* Logo Mark */}
+        <div className="flex justify-center mb-8">
+          <div className="w-16 h-16 border-2 border-[var(--accent-gold)] flex items-center justify-center transform rotate-45">
+            <div className="transform -rotate-45 text-[var(--accent-gold)] font-serif text-3xl font-bold">E</div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight text-white drop-shadow-sm">
+          Everstone<span className="text-[var(--accent-gold)]">BTC</span>
+        </h1>
+
+        <p className="text-xl text-[var(--accent-stone)] mb-12 font-light">
+          The Unstoppable Engine for Digital Immortality.
+          <br />
+          Verify any memorial anchored to the Bitcoin Blockchain.
+        </p>
+
+        <form onSubmit={handleSearch} className="w-full relative max-w-lg mx-auto mb-16">
+          <div className="relative group">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Enter Bitcoin Transaction ID (TXID)..."
+              className="w-full bg-slate-800/50 border border-slate-700 text-white px-6 py-4 rounded-full pl-14 focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)] focus:border-transparent transition-all backdrop-blur-sm placeholder:text-slate-500"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--accent-gold)] transition-colors h-5 w-5" />
+            <button
+              type="submit"
+              className="absolute right-2 top-2 bottom-2 bg-[var(--accent-gold)] text-slate-900 px-6 rounded-full font-semibold hover:bg-[#d4b365] transition-colors"
+            >
+              Verify
+            </button>
+          </div>
+        </form>
+
+        <div className="mb-16">
+          <Link href="/create" className="text-[var(--accent-gold)] hover:underline hover:text-yellow-400 transition-colors">
+            Create a New Memorial
+          </Link>
         </div>
-      </main>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-slate-400">
+          <Feature
+            icon={<ShieldCheck className="w-6 h-6 mb-2 mx-auto text-[var(--accent-gold)]" />}
+            title="Sovereign"
+            desc="No servers. Your device verifies the data directly from Bitcoin & IPFS."
+          />
+          <Feature
+            icon={<div className="w-6 h-6 mb-2 mx-auto font-serif text-[var(--accent-gold)] font-bold">∞</div>}
+            title="Permanent"
+            desc="Anchored to the most secure network in human history."
+          />
+          <Feature
+            icon={<Github className="w-6 h-6 mb-2 mx-auto text-[var(--accent-gold)]" />}
+            title="Open Source"
+            desc="Code transparency ensures long-term independence."
+          />
+        </div>
+      </motion.div>
+
+      <footer className="absolute bottom-6 text-slate-600 text-sm">
+        v1.0.0 Public Beta • Running on Mainnet
+      </footer>
+    </main>
+  );
+}
+
+function Feature({ icon, title, desc }: { icon: any, title: string, desc: string }) {
+  return (
+    <div className="p-4 rounded-xl hover:bg-slate-800/30 transition-colors duration-300">
+      {icon}
+      <h3 className="font-semibold text-slate-200 mb-1">{title}</h3>
+      <p className="text-xs text-slate-500">{desc}</p>
     </div>
   );
 }
