@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  everstone:
+    container_name: everstone-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3005:3000"
+    environment:
+      - DATABASE_URL=file:./db/prod.db
+      - BTCPAY_URL=${BTCPAY_URL}
+      - BTCPAY_API_KEY=${BTCPAY_API_KEY}
+      - BTCPAY_STORE_ID=${BTCPAY_STORE_ID}
+    volumes:
+      # Mount the database directory to persist data
+      - ./prisma/db:/app/prisma/db
+    # FOR PRODUCTION (Option B):
+    # This assumes you have Nginx/Traefik handling SSL and routing requests to port 3000

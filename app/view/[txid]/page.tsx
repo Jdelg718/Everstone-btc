@@ -42,6 +42,36 @@ export default function ViewMemorial() {
             // 1. Fetch TX
             // Handle raw payload for dev/testing if starts with EVST1 hex
             let payloadHex = '';
+
+            // --- MOCK / SIMNET HANDLING ---
+            if (id.startsWith('mock-')) {
+                setStatus('Simulating Bitcoin Block Verification...');
+                // Artificial delay for effect
+                await new Promise(r => setTimeout(r, 1500));
+
+                const res = await fetch(`/api/debug/mock-protocol/${id}`);
+                if (!res.ok) throw new Error('Mock Transaction not found in Simnet.');
+                const data = await res.json();
+
+                // Populate state directly from mock data
+                setMemorial({
+                    metadata: data.metadata,
+                    assets: data.assets
+                });
+                setOnChainHash(data.contentHash);
+                setVerifiedHash(true);
+                setRawTx({
+                    txid: id,
+                    status: {
+                        confirmed: true,
+                        block_time: data.blockTime
+                    }
+                });
+                setStatus('Ready');
+                return; // SKIP REST OF FUNCTION
+            }
+            // ------------------------------
+
             if (id.startsWith('4556535431') && id.length > 20) {
                 payloadHex = id;
             } else {

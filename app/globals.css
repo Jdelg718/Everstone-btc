@@ -6,10 +6,11 @@
 }
 
 :root {
-  --background: #0f172a; /* Slate 900 - Premium Dark */
-  --foreground: #f8fafc; /* Slate 50 */
-  --accent-gold: #c6a355;
-  --accent-stone: #94a3b8;
+  --background: #0c0a09; /* Stone 950 */
+  --foreground: #f5f5f4; /* Stone 100 */
+  --accent-gold: #f59e0b; /* Amber 500 */
+  --accent-stone: #78716c; /* Stone 500 */
+  --card-bg: #1c1917; /* Stone 900 */
 }
 
 body {
@@ -21,4 +22,9 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif), serif;
+}
+
+::selection {
+  background-color: var(--accent-gold);
+  color: #000;
 }

@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Memorial {
@@ -25,6 +26,24 @@ model Memorial {
   txid        String?  @unique
   status      String   @default("DRAFT") // DRAFT, PENDING, ANCHORED
   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Payment Relation
+  paymentStatus String   @default("UNPAID") // UNPAID, PAID
+  payments      Payment[]
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  amount      Int      // In sats or cents
+  currency    String   @default("USD")
+  status      String   @default("PENDING") // PENDING, COMPLETED, FAILED
+  providerId  String?  // ID from external provider (e.g., Stripe, BTCPay)
+  
+  memorialId  String
+  memorial    Memorial @relation(fields: [memorialId], references: [id])
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
