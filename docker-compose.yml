@@ -1,4 +1,6 @@
-version: '3.9'
+volumes:
+  everstone_db:
+
 
 services:
   everstone:
@@ -18,5 +20,12 @@ services:
       # Use a named volume for better permission management
       - everstone_db:/app/prisma/db
 
-volumes:
-  everstone_db:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: everstone-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - everstone
