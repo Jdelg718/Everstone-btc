@@ -1,6 +1,4 @@
-volumes:
-  everstone_db:
-
+version: '3.9'
 
 services:
   everstone:
@@ -19,13 +17,14 @@ services:
     volumes:
       # Use a named volume for better permission management
       - everstone_db:/app/prisma/db
+    networks:
+      - default
+      - tunnel_network
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: everstone-tunnel
-    restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-    depends_on:
-      - everstone
+networks:
+  tunnel_network:
+    external: true
+    name: nextcloud_default
+
+volumes:
+  everstone_db:
