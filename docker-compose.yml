@@ -21,12 +21,12 @@ services:
     # This assumes you have Nginx/Traefik handling SSL and routing requests to port 3000
     # OR use Cloudflare Tunnel directly as a sidecar:
 
-  tunnel:
-    container_name: everstone-tunnel
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-    depends_on:
-      - everstone
+    # tunnel:
+    #   container_name: everstone-tunnel
+    #   image: cloudflare/cloudflared:latest
+    #   restart: unless-stopped
+    #   command: tunnel run
+    #   environment:
+    #     - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    #   depends_on:
+    #     - everstone
