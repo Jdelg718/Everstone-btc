@@ -13,7 +13,7 @@ try {
     console.warn('Failed to init ECC lib:', e);
 }
 
-const NETWORK = bitcoin.networks.testnet; // TODO: Configurable
+const NETWORK = bitcoin.networks.bitcoin; // Mainnet
 
 export interface Utxo {
     txid: string;
@@ -126,22 +126,86 @@ export async function anchorMemorial(memorialId: string): Promise<string> {
 
         console.log(`Anchoring using Treasury: ${address}`);
 
-        // 1. Fetch UTXOs (Mock for now, would need an indexer API like Mempool.space)
-        // const utxos = await fetchUtxos(address!); 
-        // For real impl, we need a real UTXO fetcher.
-        // For MVP with WIF, we assume we have funds or mock this part if using real network.
-        // Since we don't have a real indexer integrated yet, we should probably MOCK the transaction construction 
-        // unless we want to build a full mempool.space client right now.
+        // 1. Fetch UTXOs from Mempool.space (Mainnet)
+        // Ensure your TREASURY_WIF corresponds to a Segwit address (Bech32)
+        const utxoRes = await fetch(`https://mempool.space/api/address/${address}/utxo`);
+        if (!utxoRes.ok) throw new Error("Failed to fetch UTXOs for treasury.");
+        const utxos: Utxo[] = await utxoRes.json();
 
-        // Let's stick to MOCK for the actual broadcasting part to ensure reliability in this demo,
-        // but structured as if it were real.
+        if (utxos.length === 0) throw new Error("Treasury wallet has no funds.");
 
-        console.log("Constructing anchor transaction for:", memorialId);
+        console.log(`Found ${utxos.length} UTXOs`);
 
-        // Simulate broadcast delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // 2. Network Fee (approx)
+        // We pay a small fee for the anchor TX
+        const MINING_FEE = 2000; // Sats
 
-        return "0000000000000000000anchor_txid_" + memorialId;
+        // 3. Construct PSBT
+        const psbt = new bitcoin.Psbt({ network: NETWORK });
+
+        let totalInput = 0;
+
+        // Add Inputs
+        for (const utxo of utxos) {
+            const txHexRes = await fetch(`https://mempool.space/api/tx/${utxo.txid}/hex`);
+            const txHex = await txHexRes.text();
+
+            psbt.addInput({
+                hash: utxo.txid,
+                index: utxo.vout,
+                witnessUtxo: {
+                    script: bitcoin.address.toOutputScript(address!, NETWORK),
+                    value: BigInt(utxo.value)
+                }
+            });
+            totalInput += utxo.value;
+            if (totalInput > MINING_FEE + 546) break; // Stop if we have enough
+        }
+
+        if (totalInput < MINING_FEE) throw new Error("Insufficient funds in treasury.");
+
+        // Add Outputs
+        // A. OP_RETURN Anchor
+        const data = encodeMemorialData(memorialId);
+        const embed = bitcoin.payments.embed({ data: [data], network: NETWORK });
+        psbt.addOutput({
+            script: embed.output!,
+            value: BigInt(0)
+        });
+
+        // B. Change
+        const change = totalInput - MINING_FEE;
+        if (change > 546) {
+            psbt.addOutput({
+                address: address!,
+                value: BigInt(change)
+            });
+        }
+
+        // 4. Sign
+        psbt.signAllInputs(keyPair);
+        psbt.finalizeAllInputs();
+        const tx = psbt.extractTransaction();
+        const txHex = tx.toHex();
+
+        console.log("Broadcasting Anchor TX...");
+
+        // 5. Broadcast (using our helper which tries multiple nodes)
+        // Make sure to import broadcastTx from ./btcpay or implement here
+        // We will just use mempool.space directly here for simplicity since we fetched from it
+        const broadcastRes = await fetch('https://mempool.space/api/tx', {
+            method: 'POST',
+            body: txHex
+        });
+
+        if (!broadcastRes.ok) {
+            throw new Error(`Broadcast failed: ${await broadcastRes.text()}`);
+        }
+
+        const txid = await broadcastRes.text();
+        console.log("Anchored successfully:", txid);
+
+        return txid;
 
     } catch (e) {
         console.error("Anchoring failed:", e);
