@@ -8,7 +8,7 @@ async function main() {
     // 1. Hal Finney
     const hal = await prisma.memorial.upsert({
         where: { slug: 'hal-finney' },
-        update: {},
+        update: { mainImage: '/images/hal.jpg' },
         create: {
             slug: 'hal-finney',
             fullName: 'Hal Finney',
@@ -27,7 +27,7 @@ async function main() {
     // 2. Len Sassaman
     const len = await prisma.memorial.upsert({
         where: { slug: 'len-sassaman' },
-        update: {},
+        update: { mainImage: '/images/bitcoin.svg' },
         create: {
             slug: 'len-sassaman',
             fullName: 'Leonard Harris Sassaman',
@@ -46,7 +46,7 @@ async function main() {
     // 3. Timothy May
     const tim = await prisma.memorial.upsert({
         where: { slug: 'timothy-c-may' },
-        update: {},
+        update: { mainImage: '/images/bitcoin.svg' },
         create: {
             slug: 'timothy-c-may',
             fullName: 'Timothy C. May',
