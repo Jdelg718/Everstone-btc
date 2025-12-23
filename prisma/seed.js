@@ -35,7 +35,7 @@ async function main() {
             deathDate: '2011-07-03',
             epitaph: 'A cypherpunk who dedicated his life to privacy.',
             bio: `# Len Sassaman\n\nLen was a true cypherpunk, privacy advocate, and maintainer of the Mixmaster anonymous remailer code. He was a PhD student at KU Leuven in Belgium, researching privacy enhancing technologies.\n\nHis memorial is famously embedded in the Bitcoin blockchain transaction 930a2114c972248550c597a37c7d52cc61a8c01e329bbb78c89ce24349479624.`,
-            mainImage: '/images/len.jpg',
+            mainImage: '/images/bitcoin.svg',
             gallery: '[]',
             status: 'ANCHORED',
             txid: '930a2114c972248550c597a37c7d52cc61a8c01e329bbb78c89ce24349479624',
@@ -54,7 +54,7 @@ async function main() {
             deathDate: '2018-12-13',
             epitaph: 'Author of the Crypto Anarchist Manifesto.',
             bio: `# Timothy C. May\n\nTim May was a technical and political writer, an electronic engineer and senior scientist at Intel, and a founder of the Cypherpunk mailing list. His "Crypto Anarchist Manifesto" (1988) predicted much of the crypto-currency revolution.\n\n> "Arise, you have nothing to lose but your barbed wire fences!"`,
-            mainImage: '/images/tim.jpg',
+            mainImage: '/images/bitcoin.svg',
             gallery: '[]',
             status: 'ANCHORED',
             paymentStatus: 'PAID'
