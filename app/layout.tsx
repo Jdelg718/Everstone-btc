@@ -63,7 +63,7 @@ export default function RootLayout({
             <div className="flex justify-center gap-6 mt-4">
               <a href="#" className="hover:text-[var(--accent-gold)] transition-colors">Terms</a>
               <a href="#" className="hover:text-[var(--accent-gold)] transition-colors">Privacy</a>
-              <a href="https://github.com/EverstoneBTC/viewer" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-gold)] transition-colors flex items-center justify-center gap-2">
+              <a href="https://github.com/Jdelg718/Everstone-btc" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-gold)] transition-colors flex items-center justify-center gap-2">
                 Download Viewer <span className="text-[10px] bg-stone-800 px-1 rounded border border-stone-700">v1.0 (OSS)</span>
               </a>
             </div>
