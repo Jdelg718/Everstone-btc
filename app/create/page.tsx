@@ -235,6 +235,21 @@ export default function CreateMemorial() {
                                         className="w-full bg-stone-950 border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors"
                                         placeholder="https://..."
                                     />
+                                    {formData.mainImage && (
+                                        <div className="mt-3 relative h-48 w-full rounded-lg overflow-hidden border border-stone-800 bg-stone-900">
+                                            <img
+                                                src={formData.mainImage}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                                referrerPolicy="no-referrer"
+                                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                onLoad={(e) => (e.currentTarget.style.display = 'block')}
+                                            />
+                                            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded text-xs text-stone-300 pointer-events-none">
+                                                Live Preview
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
@@ -334,7 +349,7 @@ export default function CreateMemorial() {
 
                                 <div className="bg-stone-950 p-6 rounded-lg border border-stone-800 space-y-4">
                                     {formData.mainImage && (
-                                        <img src={formData.mainImage} alt="Memorial" className="w-full h-48 object-cover rounded-md mb-4" />
+                                        <img src={formData.mainImage} alt="Memorial" className="w-full h-48 object-cover rounded-md mb-4" referrerPolicy="no-referrer" />
                                     )}
                                     <h3 className="text-xl font-bold text-white">{formData.fullName}</h3>
                                     <p className="text-stone-400 italic">"{formData.epitaph}"</p>
