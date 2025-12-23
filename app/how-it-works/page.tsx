@@ -11,23 +11,18 @@ export default function HowItWorksPage() {
             <div className="space-y-16 relative before:absolute before:inset-0 before:ml-1/2 before:-translate-x-1/2 before:w-0.5 before:bg-stone-800 before:-z-10">
                 <Step
                     num="01"
-                    title="Create"
-                    desc="You write a tribute and upload a photo. This data is packaged into a standardized JSON format."
+                    title="Commit"
+                    desc="A simple, one-time payment of $100 guarantees your memorial is processed. No subscriptions, no servers to maintain, just a permanent commitment."
                 />
                 <Step
                     num="02"
-                    title="Hash"
-                    desc="We calculate the SHA-256 hash of your data package. This is the unique digital fingerprint."
+                    title="Anchor"
+                    desc="We generate a digital fingerprint (hash) of your media. This is embedded into the Bitcoin blockchain using an OP_RETURN. We use less than 80 bytes to remain good stewards of the timechain, respecting the block space of node runners worldwide."
                 />
                 <Step
                     num="03"
-                    title="Anchor"
-                    desc="We broadcast a Bitcoin transaction containing this hash in an OP_RETURN output."
-                />
-                <Step
-                    num="04"
-                    title="Verify"
-                    desc="Once confirmed in a block, anyone can take your data, hash it, and verify it matches the hash on the blockchain."
+                    title="Preserve"
+                    desc="We provide a downloadable data bundle and an open-source viewer. Even if this website disappears, you can self-host the viewer or verify your memorial's existence using any Bitcoin explorer. True sovereignty."
                 />
             </div>
 
