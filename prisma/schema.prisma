@@ -28,6 +28,7 @@ model Memorial {
   txid        String?  @unique
   status      String   @default("DRAFT") // DRAFT, PENDING, ANCHORED
   anchoringPriority String @default("standard") // standard, fast, instant
+  isPublic          Boolean @default(false)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

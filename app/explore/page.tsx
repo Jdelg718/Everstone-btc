@@ -11,10 +11,11 @@ export default async function ExplorePage() {
     // Fetch memorials that are public (Anchored or Pending/Paid)
     const memorials = await prisma.memorial.findMany({
         where: {
+            isPublic: true,
+            // Only show completed or pending (not draft)
             OR: [
                 { status: 'ANCHORED' },
                 { status: 'PENDING' },
-                // Also include paid drafts for testing if needed, or just rely on the manual update we did
                 { paymentStatus: 'PAID' }
             ]
         },

@@ -8,7 +8,7 @@ async function main() {
     // 1. Hal Finney
     const hal = await prisma.memorial.upsert({
         where: { slug: 'hal-finney' },
-        update: { mainImage: '/images/hal.jpg' },
+        update: { mainImage: '/images/hal.jpg', isPublic: true },
         create: {
             slug: 'hal-finney',
             fullName: 'Hal Finney',
@@ -20,14 +20,15 @@ async function main() {
             gallery: '[]',
             status: 'ANCHORED',
             txid: 'f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16',
-            paymentStatus: 'PAID'
+            paymentStatus: 'PAID',
+            isPublic: true
         },
     });
 
     // 2. Len Sassaman
     const len = await prisma.memorial.upsert({
         where: { slug: 'len-sassaman' },
-        update: { mainImage: '/images/bitcoin.svg' },
+        update: { mainImage: '/images/bitcoin.svg', isPublic: true },
         create: {
             slug: 'len-sassaman',
             fullName: 'Leonard Harris Sassaman',
@@ -39,14 +40,15 @@ async function main() {
             gallery: '[]',
             status: 'ANCHORED',
             txid: '930a2114c972248550c597a37c7d52cc61a8c01e329bbb78c89ce24349479624',
-            paymentStatus: 'PAID'
+            paymentStatus: 'PAID',
+            isPublic: true
         },
     });
 
     // 3. Timothy May
     const tim = await prisma.memorial.upsert({
         where: { slug: 'timothy-c-may' },
-        update: { mainImage: '/images/bitcoin.svg' },
+        update: { mainImage: '/images/bitcoin.svg', isPublic: true },
         create: {
             slug: 'timothy-c-may',
             fullName: 'Timothy C. May',
@@ -57,7 +59,8 @@ async function main() {
             mainImage: '/images/bitcoin.svg',
             gallery: '[]',
             status: 'ANCHORED',
-            paymentStatus: 'PAID'
+            paymentStatus: 'PAID',
+            isPublic: true
         },
     });
 
@@ -71,6 +74,7 @@ async function main() {
             status: 'ANCHORED',
             txid: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
             paymentStatus: 'PAID',
+            isPublic: true,
             epitaph: 'I\'ve moved on to other things.',
             deathDate: '2011-04-26',
             birthDate: '1975-04-05'
@@ -86,7 +90,8 @@ async function main() {
             gallery: '[]',
             status: 'ANCHORED',
             txid: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
-            paymentStatus: 'PAID'
+            paymentStatus: 'PAID',
+            isPublic: true
         },
     });
 

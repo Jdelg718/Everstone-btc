@@ -44,6 +44,7 @@ export async function POST(request: Request) {
                 anchoringPriority: anchoringPriority || 'standard',
                 status: 'DRAFT',
                 email: email || null,
+                isPublic: body.isPublic || false, // Default to private
             },
         });
 
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
 export async function GET() {
     try {
         const memorials = await prisma.memorial.findMany({
+            where: { isPublic: true },
             orderBy: { createdAt: 'desc' },
         });
         return NextResponse.json(memorials);

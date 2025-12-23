@@ -20,7 +20,8 @@ export default function CreateMemorial() {
         bio: '',
         mainImage: '',
         anchoringPriority: 'standard',
-        email: ''
+        email: '',
+        isPublic: false
     });
 
     // Fee State
@@ -207,6 +208,22 @@ export default function CreateMemorial() {
                                             className="w-full bg-stone-950 border border-stone-800 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors"
                                             placeholder="For receipt & backup..."
                                         />
+                                    </div>
+                                </div>
+
+                                <div className="bg-stone-900/50 p-4 rounded-lg border border-stone-800 flex items-start gap-3">
+                                    <div className="flex items-center h-5">
+                                        <input
+                                            id="isPublic"
+                                            type="checkbox"
+                                            checked={formData.isPublic}
+                                            onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
+                                            className="w-4 h-4 rounded border-stone-700 bg-stone-900 text-amber-600 focus:ring-amber-500 focus:ring-offset-stone-900"
+                                        />
+                                    </div>
+                                    <div className="text-sm">
+                                        <label htmlFor="isPublic" className="font-medium text-stone-200">Make this memorial public?</label>
+                                        <p className="text-stone-500">Public memorials appear on the Explore page. Private ones are only accessible via their direct link.</p>
                                     </div>
                                 </div>
 
