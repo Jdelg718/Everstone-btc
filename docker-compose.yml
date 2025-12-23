@@ -15,18 +15,8 @@ services:
       - BTCPAY_API_KEY=${BTCPAY_API_KEY}
       - BTCPAY_STORE_ID=${BTCPAY_STORE_ID}
     volumes:
-      # Mount the database directory to persist data
-      - ./prisma/db:/app/prisma/db
-    # FOR PRODUCTION (Option B):
-    # This assumes you have Nginx/Traefik handling SSL and routing requests to port 3000
-    # OR use Cloudflare Tunnel directly as a sidecar:
+      # Use a named volume for better permission management
+      - everstone_db:/app/prisma/db
 
-    # tunnel:
-    #   container_name: everstone-tunnel
-    #   image: cloudflare/cloudflared:latest
-    #   restart: unless-stopped
-    #   command: tunnel run
-    #   environment:
-    #     - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-    #   depends_on:
-    #     - everstone
+volumes:
+  everstone_db:
