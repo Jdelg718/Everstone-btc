@@ -15,7 +15,7 @@ const simpleSlugify = (text: string) => {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { fullName, birthDate, deathDate, epitaph, bio, mainImage, gallery } = body;
+        const { fullName, birthDate, deathDate, epitaph, bio, mainImage, gallery, anchoringPriority, email } = body;
 
         // Basic validation
         if (!fullName || !birthDate || !deathDate) {
@@ -41,7 +41,9 @@ export async function POST(request: Request) {
                 bio: bio || '',
                 mainImage: mainImage || '',
                 gallery: JSON.stringify(gallery || []), // storing as JSON string
+                anchoringPriority: anchoringPriority || 'standard',
                 status: 'DRAFT',
+                email: email || null,
             },
         });
 

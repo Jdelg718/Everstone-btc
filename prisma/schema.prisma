@@ -20,11 +20,13 @@ model Memorial {
   // Content
   bio         String
   mainImage   String
-  gallery     String // Store as JSON string since SQLite doesn't support JSON type natively in all versions, or use simple string
+  gallery     String   @default("[]") // JSON string for additional images
+  email       String?  // Optional for privacy
   
   // Blockchain Anchor
   txid        String?  @unique
   status      String   @default("DRAFT") // DRAFT, PENDING, ANCHORED
+  anchoringPriority String @default("standard") // standard, fast, instant
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

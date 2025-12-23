@@ -61,7 +61,36 @@ async function main() {
         },
     });
 
-    console.log({ hal, len, tim });
+    // 4. Satoshi Nakamoto
+    const satoshi = await prisma.memorial.upsert({
+        where: { slug: 'satoshi-nakamoto' },
+        update: {
+            fullName: 'Satoshi Nakamoto',
+            bio: `# Satoshi Nakamoto\n\nThe pseudonymous creator of Bitcoin and author of the Bitcoin Whitepaper. Satoshi solved the double-spending problem for digital currency using a Peer-to-Peer network.\n\n> "If you don't believe me or don't get it, I don't have time to try to convince you, sorry."\n\nSatoshi was active in the development of Bitcoin until December 2010.`,
+            mainImage: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg',
+            status: 'ANCHORED',
+            txid: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
+            paymentStatus: 'PAID',
+            epitaph: 'I\'ve moved on to other things.',
+            deathDate: '2011-04-26',
+            birthDate: '1975-04-05'
+        },
+        create: {
+            slug: 'satoshi-nakamoto',
+            fullName: 'Satoshi Nakamoto',
+            birthDate: '1975-04-05',
+            deathDate: '2011-04-26',
+            epitaph: 'I\'ve moved on to other things.',
+            bio: `# Satoshi Nakamoto\n\nThe pseudonymous creator of Bitcoin and author of the Bitcoin Whitepaper. Satoshi solved the double-spending problem for digital currency using a Peer-to-Peer network.\n\n> "If you don't believe me or don't get it, I don't have time to try to convince you, sorry."\n\nSatoshi was active in the development of Bitcoin until December 2010.`,
+            mainImage: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg',
+            gallery: '[]',
+            status: 'ANCHORED',
+            txid: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
+            paymentStatus: 'PAID'
+        },
+    });
+
+    console.log({ hal, len, tim, satoshi });
     console.log('✅ Seed completed.');
 }
 

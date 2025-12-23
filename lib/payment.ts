@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
-import { v4 as uuidv4 } from 'uuid';
+import { createInvoice as createBtcPayInvoice, getInvoiceStatus as getBtcPayStatus } from './btcpay';
+import { anchorMemorial } from './anchoring';
 
 export type PaymentRequest = {
     memorialId: string;
@@ -9,23 +10,28 @@ export type PaymentRequest = {
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 export async function createInvoice(request: PaymentRequest) {
-    // 1. Create Payment Record
+    // 1. Create Invoice via BTCPay (or mock if config missing)
+    // We use the memorialId as the orderId for correlation
+    // BTCPay expects amount in standard units (e.g. Dollars), but our internal app uses cents.
+    const btcPayInvoice = await createBtcPayInvoice(request.amount / 100, 'USD', request.memorialId);
+
+    // 2. Create Payment Record in our DB
     const payment = await prisma.payment.create({
         data: {
             memorialId: request.memorialId,
             amount: request.amount,
             currency: 'USD',
             status: 'PENDING',
-            providerId: `mock_inv_${uuidv4()}`
+            providerId: btcPayInvoice.id
         }
     });
 
-    // 2. Return Invoice Details (Simulated)
+    // 3. Return Invoice Details
     return {
         invoiceId: payment.id,
         providerId: payment.providerId,
         amount: payment.amount,
-        checkoutUrl: `/pay/${payment.id}` // In real app, this would be Stripe/BTCPay URL
+        checkoutUrl: btcPayInvoice.checkoutLink
     };
 }
 
@@ -37,11 +43,36 @@ export async function checkPaymentStatus(paymentId: string): Promise<PaymentStat
 
     if (!payment) throw new Error('Payment not found');
 
-    // MOCK LOGIC: If it's been > 10 seconds, mark as paid
-    // In reality, this would check Stripe/BTCPay API
-    if (payment.status === 'PENDING') {
-        // Auto-complete for demo purposes
-        // Update both Payment and Memorial status
+    if (!payment.providerId) {
+        return payment.status as PaymentStatus;
+    }
+
+    // Always check real status from BTCPay (which handles mock fallback internally)
+    const btcPayStatus = await getBtcPayStatus(payment.providerId);
+
+    let newStatus: PaymentStatus = 'PENDING';
+
+    // Map BTCPay status to our internal status
+    // BTCPay: New, Processing, Settled, Invalid, Expired
+    console.log(`[Payment] Mapping BTCPay status: ${btcPayStatus}`);
+    switch (btcPayStatus) {
+        case 'Settled':
+        case 'Processing':
+        case 'Paid':
+            newStatus = 'COMPLETED';
+            break;
+        case 'Invalid':
+        case 'Expired':
+            newStatus = 'FAILED';
+            break;
+        default:
+            newStatus = 'PENDING';
+    }
+
+    // If status changed to COMPLETED, update DB
+    if (newStatus === 'COMPLETED' && payment.status !== 'COMPLETED') {
+        const txid = await anchorMemorial(payment.memorialId);
+
         await prisma.$transaction([
             prisma.payment.update({
                 where: { id: paymentId },
@@ -49,11 +80,15 @@ export async function checkPaymentStatus(paymentId: string): Promise<PaymentStat
             }),
             prisma.memorial.update({
                 where: { id: payment.memorialId },
-                data: { paymentStatus: 'PAID' }
+                data: {
+                    paymentStatus: 'PAID',
+                    status: 'ANCHORED',
+                    txid: txid
+                }
             })
         ]);
         return 'COMPLETED';
     }
 
-    return payment.status as PaymentStatus;
+    return newStatus;
 }

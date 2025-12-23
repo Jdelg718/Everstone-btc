@@ -1,40 +1,41 @@
 // lib/btcpay.ts
+import { Agent } from 'undici';
+
+// Custom dispatcher to ignore self-signed certs for local node
+const dispatcher = new Agent({
+    connect: {
+        rejectUnauthorized: false
+    }
+});
 
 export interface BTCPayInvoice {
     id: string;
     checkoutLink: string;
     status: 'New' | 'Processing' | 'Settled' | 'Invalid' | 'Expired';
+    receiptLink: string;
     amount: string;
     currency: string;
-    receiptLink: string;
 }
-
-const BTCPAY_URL = process.env.BTCPAY_URL; // e.g. https://mainnet.demo.btcpayserver.org
-const BTCPAY_API_KEY = process.env.BTCPAY_API_KEY;
-const BTCPAY_STORE_ID = process.env.BTCPAY_STORE_ID;
 
 /**
  * Creates an invoice on your BTCPay Server.
- * Falls back to MOCK implementation if ENV vars are not set.
  */
 export async function createInvoice(price: number, currency: string = 'USD', orderId: string): Promise<BTCPayInvoice> {
-    // FALLBACK: If no real BTCPay config, use Data Mock
+    const BTCPAY_URL = process.env.BTCPAY_URL;
+    const BTCPAY_API_KEY = process.env.BTCPAY_API_KEY;
+    const BTCPAY_STORE_ID = process.env.BTCPAY_STORE_ID;
+
     if (!BTCPAY_URL || !BTCPAY_API_KEY || !BTCPAY_STORE_ID) {
-        console.warn("⚠️ BTCPay Config missing. Using MOCK invoice.");
-        await new Promise(resolve => setTimeout(resolve, 800));
-        return {
-            id: `mock_inv_${Math.random().toString(36).substring(7)} `,
-            checkoutLink: `#`, // UX should handle this
-            status: 'New',
-            amount: price.toString(),
-            currency: currency,
-            receiptLink: `#`
-        };
+        throw new Error("BTCPay Config Missing");
     }
 
-    // REAL: Call BTCPay Verification API
     try {
-        const res = await fetch(`${BTCPAY_URL} /api/v1 / stores / ${BTCPAY_STORE_ID}/invoices`, {
+        const baseUrl = BTCPAY_URL.replace(/\/$/, '');
+        const url = `${baseUrl}/api/v1/stores/${BTCPAY_STORE_ID}/invoices`;
+        console.log("Creating real invoice at:", url);
+
+        // @ts-ignore - 'dispatcher' is supported in Next.js/Node fetch but Types might not match perfectly
+        const res = await fetch(url, {
             method: 'POST',
             headers: {
                 'Authorization': `token ${BTCPAY_API_KEY}`,
@@ -47,10 +48,13 @@ export async function createInvoice(price: number, currency: string = 'USD', ord
                     orderId: orderId
                 },
                 checkout: {
-                    speedPolicy: "MediumSpeed"
+                    speedPolicy: "MediumSpeed",
+                    // Ensure we redirect back or have some navigation? 
+                    // For now default BTCPay behavior.
                 }
-            })
-        });
+            }),
+            dispatcher: dispatcher // Use custom dispatcher for SSL
+        } as any);
 
         if (!res.ok) {
             const errText = await res.text();
@@ -73,28 +77,69 @@ export async function createInvoice(price: number, currency: string = 'USD', ord
 }
 
 export async function getInvoiceStatus(invoiceId: string): Promise<string> {
+    const BTCPAY_URL = process.env.BTCPAY_URL;
+    const BTCPAY_API_KEY = process.env.BTCPAY_API_KEY;
+    const BTCPAY_STORE_ID = process.env.BTCPAY_STORE_ID;
+
     if (!BTCPAY_URL || !BTCPAY_API_KEY || !BTCPAY_STORE_ID) {
-        return 'New'; // Mock always New or implement mock state toggle if needed
+        return 'Invalid';
     }
 
-    const res = await fetch(`${BTCPAY_URL}/api/v1/stores/${BTCPAY_STORE_ID}/invoices/${invoiceId}`, {
+    const baseUrl = (BTCPAY_URL || '').replace(/\/$/, '');
+    // @ts-ignore
+    const res = await fetch(`${baseUrl}/api/v1/stores/${BTCPAY_STORE_ID}/invoices/${invoiceId}`, {
         headers: {
             'Authorization': `token ${BTCPAY_API_KEY}`
-        }
-    });
+        },
+        dispatcher: dispatcher
+    } as any);
 
     if (res.ok) {
         const data = await res.json();
         return data.status;
+    } else {
+        const err = await res.text();
+        console.error(`Status check failed: ${res.status} ${err}`);
+        return 'Invalid';
     }
-    return 'Invalid';
 }
 
 export async function getPaymentAddressForInvoice(invoiceId: string): Promise<string> {
     // In a real app, you would fetch payment methods of the invoice
     // GET /api/v1/stores/{storeId}/invoices/{invoiceId}/payment-methods
-    // This is significant logic to parse the BTC address.
-    // For now, we return a mock or placeholder.
     return "tb1qk2...REAL_IMPL_NEEDED";
 }
 
+export async function broadcastTx(txHex: string): Promise<string> {
+    const BTCPAY_URL = process.env.BTCPAY_URL;
+    // MyNode Mempool is often at port 4080 (HTTPS) or 3006 (HTTP)
+    // We can try to guess from BTCPay URL or just use a list
+    const candidates = [
+        `https://mynode.local:4080/api/tx`,
+        `http://mynode.local:3006/api/tx`,
+        `https://mempool.space/testnet/api/tx` // Fallback
+    ];
+
+    for (const url of candidates) {
+        try {
+            console.log(`Broadcasting to ${url}...`);
+            // @ts-ignore
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: txHex,
+                dispatcher: dispatcher // Reuse our SSL-ignoring agent
+            } as any);
+
+            if (res.ok) {
+                const txid = await res.text();
+                return txid;
+            } else {
+                console.warn(`Broadcast to ${url} failed:`, await res.text());
+            }
+        } catch (e) {
+            console.warn(`Broadcast to ${url} error:`, e);
+        }
+    }
+    throw new Error('Failed to broadcast transaction to any node.');
+}

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../../lib/prisma';
+import { sendReceiptEmail } from '@/lib/email';
 
 export async function POST(
     request: Request,
@@ -18,9 +19,25 @@ export async function POST(
             data: {
                 status: 'ANCHORED',
                 txid: txid,
-                // In a real app, we might also save the IPFS hash here if we uploaded it
             }
         });
+
+        // 3. Send Receipt Email (if email exists)
+        if (memorial.email) {
+            try {
+                await sendReceiptEmail({
+                    email: memorial.email,
+                    fullName: memorial.fullName,
+                    txid: txid,
+                    memorialSlug: memorial.slug,
+                    bundleUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/memorials/${memorial.slug}/download`
+                });
+                console.log(`Email receipt sent to ${memorial.email}`);
+            } catch (emailError) {
+                console.error('Failed to send email receipt:', emailError);
+                // Don't fail the request if email fails
+            }
+        }
 
         return NextResponse.json({
             success: true,
