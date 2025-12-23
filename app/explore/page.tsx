@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
+import { Memorial } from '@prisma/client';
 
 // Force dynamic rendering so we see new memorials immediately
 export const dynamic = 'force-dynamic';
@@ -46,7 +47,7 @@ export default async function ExplorePage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {memorials.map((memorial) => (
+                        {memorials.map((memorial: Memorial) => (
                             <Link href={`/m/${memorial.slug}`} key={memorial.id} className="block group">
                                 <article className="bg-stone-900 border border-stone-800 rounded-xl overflow-hidden hover:border-amber-500/50 transition-all duration-300 h-full flex flex-col">
                                     <div className="aspect-[4/3] bg-stone-800 relative overflow-hidden">
