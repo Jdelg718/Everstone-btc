@@ -15,6 +15,7 @@ const playfair = Playfair_Display({
 import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://everstonebtc.com"),
   title: "Everstone - Digital Memorials on Bitcoin",
   description: "Etch their memory into eternity. Unstoppable, decentralized, and permanent digital memorials.",
   openGraph: {
