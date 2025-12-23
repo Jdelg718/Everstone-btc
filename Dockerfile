@@ -61,6 +61,8 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy specific WASM dependencies that might be missed by trace
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/tiny-secp256k1 ./node_modules/tiny-secp256k1
 # Copy the database and migrations if using SQLite
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 # Provide correct permissions for sqlite db if it exists, or let entrypoint handle it
