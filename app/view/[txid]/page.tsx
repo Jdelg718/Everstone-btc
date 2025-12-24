@@ -124,8 +124,8 @@ export default function ViewMemorial() {
             let fetchedFromApi = false;
 
             if (isServiceMode) {
-                // Fetch from local API
-                const res = await fetch(`/api/memorials/${slugFromPayload}/download`);
+                // Fetch from local API (Cache Buster Added)
+                const res = await fetch(`/api/memorials/${slugFromPayload}/download?t=${Date.now()}`);
                 if (!res.ok) throw new Error(`Could not retrieve bundle for ${slugFromPayload}`);
                 blob = await res.blob();
                 fetchedFromApi = true;
