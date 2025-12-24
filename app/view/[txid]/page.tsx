@@ -159,6 +159,7 @@ export default function ViewMemorial() {
 
             if (!isServiceMode && protocol) {
                 const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
                 const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
                 if (calculatedHash !== protocol.contentHash) {
