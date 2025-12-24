@@ -280,6 +280,14 @@ export default function ViewMemorial() {
         }
     };
 
+    const { metadata, assets } = memorial;
+    let mainImageSrc = assets[metadata.content.mainImage] || assets[`assets/${metadata.content.mainImage}`];
+
+    // Fallback for Service Mode (External URLs)
+    if (!mainImageSrc && metadata.content.mainImage && (metadata.content.mainImage.startsWith('http') || metadata.content.mainImage.startsWith('/'))) {
+        mainImageSrc = metadata.content.mainImage;
+    }
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-[var(--accent-gold)] selection:text-slate-900">
             {/* Header */}
