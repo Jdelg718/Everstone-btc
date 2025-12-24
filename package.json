@@ -2,11 +2,16 @@
   "name": "everstone-viewer",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
+  "description": "Everstone Universal Viewer",
+  "author": "EverstoneBTC",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "electron:dev": "concurrently \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "next build --webpack && electron-builder"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -17,6 +22,7 @@
     "bitcoinjs-lib": "^7.0.0",
     "buffer": "^6.0.3",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "ecpair": "^3.0.0",
     "framer-motion": "^12.23.25",
     "js-untar": "^2.0.0",
@@ -29,6 +35,7 @@
     "pako": "^2.1.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "serve-handler": "^6.1.6",
     "tailwind-merge": "^3.4.0",
     "tiny-secp256k1": "^2.2.4",
     "undici": "^7.16.0",
@@ -39,14 +46,65 @@
     "@types/node": "^20.19.27",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wait-on": "^9.0.3"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
+  },
+  "build": {
+    "appId": "com.everstonebtc.viewer",
+    "productName": "Everstone Viewer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/main.js",
+      "package.json",
+      {
+        "from": ".next/standalone",
+        "to": ".",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": ".next/static",
+        "to": ".next/static",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "**/node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "verifyUpdateCodeSignature": false,
+      "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

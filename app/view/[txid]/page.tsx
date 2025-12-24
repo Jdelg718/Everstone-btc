@@ -20,6 +20,7 @@ interface MemorialData {
     assets: Record<string, string>; // path -> objectURL
 }
 
+
 export default function ViewMemorial() {
     const params = useParams();
     const txid = params.txid as string;
@@ -325,7 +326,6 @@ export default function ViewMemorial() {
                             onError={(e) => {
                                 console.error("Image Failed to Load:", mainImageSrc);
                                 (e.target as HTMLImageElement).style.display = 'none';
-                                alert(`Failed to load image: ${mainImageSrc}`);
                             }}
                             onLoad={() => console.log("Image Loaded Successfully:", mainImageSrc)}
                         />

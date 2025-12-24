@@ -100,6 +100,11 @@ export default function Home() {
               title="3. Anchor to Bitcoin"
               desc="We embed this fingerprint into a Bitcoin transaction using OP_RETURN. It is now immutable."
             />
+            <FeatureStep
+              icon={<ShieldCheck className="w-8 h-8 text-amber-500" />}
+              title="4. Offline Cold Storage"
+              desc="Download the Universal Viewer and your memorial bundle. Verify it offline, forever, with zero dependency on our servers."
+            />
           </div>
         </div>
       </section>
