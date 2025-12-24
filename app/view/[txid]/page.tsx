@@ -304,7 +304,7 @@ export default function ViewMemorial() {
     // Fallback for Service Mode (External URLs) - Simplified
     if (!mainImageSrc && metadata.content.mainImage) {
         const rawUrl = metadata.content.mainImage.trim();
-        if (rawUrl.startsWith('http') || rawUrl.startsWith('/')) {
+        if (rawUrl.startsWith('http') || rawUrl.startsWith('/') || rawUrl.startsWith('data:')) {
             console.log("Using external image URL:", rawUrl);
             mainImageSrc = rawUrl;
         }
