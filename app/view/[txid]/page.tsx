@@ -255,11 +255,16 @@ export default function ViewMemorial() {
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-[var(--accent-gold)] selection:text-slate-900">
             {/* Verification Header */}
             <div className="bg-slate-900 border-b border-slate-800 py-3 px-6 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-80">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 border border-[var(--accent-gold)] flex items-center justify-center transform rotate-45">
-                        <span className="transform -rotate-45 text-[var(--accent-gold)] font-bold text-xs">E</span>
-                    </div>
-                    <span className="font-serif ml-2 hidden sm:block">Everstone Viewer</span>
+                <div className="flex items-center gap-6">
+                    <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <div className="w-8 h-8 border border-[var(--accent-gold)] flex items-center justify-center transform rotate-45">
+                            <span className="transform -rotate-45 text-[var(--accent-gold)] font-bold text-xs">E</span>
+                        </div>
+                        <span className="font-serif ml-2 hidden sm:block text-slate-100">Everstone Viewer</span>
+                    </Link>
+                    <Link href="/explore" className="text-sm font-sans text-slate-400 hover:text-[var(--accent-gold)] transition-colors hidden md:block">
+                        Explore
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3 bg-green-900/20 border border-green-800/50 px-4 py-1.5 rounded-full">
