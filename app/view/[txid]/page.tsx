@@ -291,7 +291,8 @@ export default function ViewMemorial() {
                                         <div className="flex items-center justify-center h-full text-slate-700">Image not loaded</div>
                                     )}
                                 </div>
-                            ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
