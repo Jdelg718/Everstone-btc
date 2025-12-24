@@ -90,7 +90,8 @@ export async function checkPaymentStatus(paymentId: string): Promise<{ status: P
                 data: {
                     paymentStatus: 'PAID',
                     status: 'ANCHORED',
-                    txid: txid
+                    txid: txid,
+                    isPublic: true
                 }
             })
         ]);
