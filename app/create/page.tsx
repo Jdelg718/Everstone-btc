@@ -349,7 +349,21 @@ export default function CreateMemorial() {
 
                                 <div className="bg-stone-950 p-6 rounded-lg border border-stone-800 space-y-4">
                                     {formData.mainImage && (
-                                        <img src={formData.mainImage} alt="Memorial" className="w-full h-48 object-cover rounded-md mb-4" referrerPolicy="no-referrer" />
+                                        <div className="relative">
+                                            <img
+                                                src={formData.mainImage}
+                                                alt="Memorial"
+                                                className="w-full h-48 object-cover rounded-md mb-4"
+                                                referrerPolicy="no-referrer"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                    e.currentTarget.parentElement?.classList.add('bg-stone-800', 'flex', 'items-center', 'justify-center', 'h-48', 'mb-4', 'rounded-md');
+                                                    if (e.currentTarget.parentElement) {
+                                                        e.currentTarget.parentElement.innerHTML = '<span class="text-stone-500 text-sm">Image failed to load</span>';
+                                                    }
+                                                }}
+                                            />
+                                        </div>
                                     )}
                                     <h3 className="text-xl font-bold text-white">{formData.fullName}</h3>
                                     <p className="text-stone-400 italic">"{formData.epitaph}"</p>
