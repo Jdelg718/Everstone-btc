@@ -26,6 +26,15 @@ async function main() {
         txid: 'mock-shannon-tx'
     };
 
+    // CLEANUP CONFLICT: Delete any existing memorial with this slug but different ID
+    await prisma.memorial.deleteMany({
+        where: {
+            slug: 'claude-shannon',
+            id: { not: id } // Don't delete self if ID matches
+        }
+    });
+    console.log("Cleanup: Removed conflicting slugs.");
+
     const memorial = await prisma.memorial.upsert({
         where: { id },
         update: data,
