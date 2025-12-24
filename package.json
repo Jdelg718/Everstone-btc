@@ -64,6 +64,7 @@
   "build": {
     "appId": "com.everstonebtc.viewer",
     "productName": "Everstone Viewer",
+    "asar": false,
     "directories": {
       "output": "dist"
     },

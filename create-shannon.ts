@@ -7,7 +7,7 @@ async function main() {
     const id = 'cmjjb9d1e0000zwsyrnp5fxkv';
     console.log(`Restoring/Updating Memorial ID: ${id}`);
 
-    const mainImage = "https://upload.wikimedia.org/wikipedia/commons/9/99/Claude_Shannon_MFO_3807.jpg";
+    const mainImage = "https://upload.wikimedia.org/wikipedia/commons/9/99/ClaudeShannon_MFO3807.jpg";
     const gallery = JSON.stringify([
         "https://upload.wikimedia.org/wikipedia/commons/c/c8/Claude_Shannon_1.jpg",
         "https://upload.wikimedia.org/wikipedia/commons/f/f6/Claude_Shannon_statue.jpg"

@@ -15,9 +15,15 @@ let serverProcess;
 function startServer() {
     if (IS_DEV) return; // In dev, we use the external "npm run dev" server
 
-    // In production, the standalone server is at the root of the app resources
-    const serverPath = path.join(process.resourcesPath, 'server.js');
+    // Use __dirname to find server.js relative to electron/main.js (which is at root/electron/main.js)
+    // So server.js is at root/server.js => ../server.js
+    const serverPath = path.join(__dirname, '..', 'server.js');
     console.log("Starting Next.js Server at:", serverPath);
+
+    if (!require('fs').existsSync(serverPath)) {
+        require('electron').dialog.showErrorBox('Error', 'Internal Server File Not Found: ' + serverPath);
+        return;
+    }
 
     serverProcess = spawn('node', [serverPath], {
         env: {
@@ -26,15 +32,17 @@ function startServer() {
             HOSTNAME: 'localhost',
             NODE_ENV: 'production'
         },
-        // cwd should be where server.js is, to find .next/ and public/
-        cwd: process.resourcesPath
+        cwd: path.dirname(serverPath)
     });
 
     serverProcess.stdout.on('data', (data) => console.log(`[Next]: ${data}`));
     serverProcess.stderr.on('data', (data) => console.error(`[Next Err]: ${data}`));
 
     serverProcess.on('exit', (code) => {
-        console.log(`Next.js server exited with code ${code}`);
+        if (code !== 0 && code !== null) {
+            console.error(`Next.js server exited with code ${code}`);
+            // Only show if it crashes immediately
+        }
     });
 }
 
