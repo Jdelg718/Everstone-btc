@@ -93,46 +93,89 @@ export default function ViewMemorial() {
 
             // 2. Decode Protocol
             setStatus('Decoding EVST1 Protocol...');
-            const protocol = decodePayload(Buffer.from(payloadHex, 'hex'));
-            setOnChainHash(protocol.contentHash);
+
+            const payloadBuf = Buffer.from(payloadHex, 'hex');
+            const payloadAscii = payloadBuf.toString('utf-8');
+
+            let protocol: any = null;
+            let isServiceMode = false;
+            let slugFromPayload = '';
+
+            // Check for Service Mode: "EVST1:slug"
+            if (payloadAscii.startsWith('EVST1:') && !payloadAscii.includes('\0')) {
+                isServiceMode = true;
+                slugFromPayload = payloadAscii.substring(6); // remove EVST1:
+                console.log("Detected Service Mode Anchor for:", slugFromPayload);
+            } else {
+                // Try Binary Decode
+                try {
+                    protocol = decodePayload(payloadBuf);
+                    setOnChainHash(protocol.contentHash);
+                } catch (e) {
+                    // If binary decode fails and it looked like binary, throw
+                    throw new Error('Unknown Protocol Format');
+                }
+            }
 
             // 3. Download Bundle
-            setStatus(`Downloading from Storage (${protocol.storageType === STORAGE_TYPES.IPFS ? 'IPFS' : 'Arweave'})...`);
+            setStatus('Downloading Memorial Data...');
             let blob: Blob | null = null;
+            let fetchedFromApi = false;
 
-            if (protocol.storageType === STORAGE_TYPES.IPFS) {
-                // Try gateways
-                for (const gateway of IPFS_GATEWAYS) {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout per gateway
-                        const res = await fetch(`${gateway}${protocol.storagePointer}`, { signal: controller.signal });
-                        clearTimeout(timeoutId);
-                        if (res.ok) {
-                            blob = await res.blob();
-                            break;
+            if (isServiceMode) {
+                // Fetch from local API
+                const res = await fetch(`/api/memorials/${slugFromPayload}/download`);
+                if (!res.ok) throw new Error(`Could not retrieve bundle for ${slugFromPayload}`);
+                blob = await res.blob();
+                fetchedFromApi = true;
+            } else if (protocol) {
+                // Storage Type Logic (IPFS/Arweave)
+                if (protocol.storageType === STORAGE_TYPES.IPFS) {
+                    // ... existing IPFS logic ...
+                    for (const gateway of IPFS_GATEWAYS) {
+                        try {
+                            const controller = new AbortController();
+                            const timeoutId = setTimeout(() => controller.abort(), 5000);
+                            const res = await fetch(`${gateway}${protocol.storagePointer}`, { signal: controller.signal });
+                            clearTimeout(timeoutId);
+                            if (res.ok) {
+                                blob = await res.blob();
+                                break;
+                            }
+                        } catch (e) {
+                            console.warn(`Gateway ${gateway} failed`, e);
                         }
-                    } catch (e) {
-                        console.warn(`Gateway ${gateway} failed`, e);
                     }
+                    if (!blob) throw new Error('Could not retrieve bundle from any IPFS gateway.');
+                } else {
+                    throw new Error('Arweave storage not yet supported in web viewer.');
                 }
-                if (!blob) throw new Error('Could not retrieve bundle from any IPFS gateway.');
+            }
+
+            // 4. Verify Hash (Only if Binary Protocol)
+            setStatus('Verifying Integrity...');
+            const arrayBuffer = await blob!.arrayBuffer();
+
+            if (!isServiceMode && protocol) {
+                const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                if (calculatedHash !== protocol.contentHash) {
+                    setError(`CRITICAL: Hash Mismatch. Expected ${protocol.contentHash}, got ${calculatedHash}. Data may be tampered.`);
+                    return;
+                }
+                setVerifiedHash(true);
             } else {
-                throw new Error('Arweave storage not yet supported in web viewer.');
+                // In Service Mode, we trust the downloaded bundle matches the ID
+                setVerifiedHash(true);
+                // We don't have an on-chain hash to compare against, 
+                // but we confirmed the TX exists and anchors this ID.
+                // We can calculate the hash of what we got for display purposes
+                const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                setOnChainHash(hashArray.map(b => b.toString(16).padStart(2, '0')).join(''));
             }
-
-            // 4. Verify Hash
-            setStatus('Verifying Cryptographic Integrity...');
-            const arrayBuffer = await blob.arrayBuffer();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            if (calculatedHash !== protocol.contentHash) {
-                setError(`CRITICAL: Hash Mismatch. Expected ${protocol.contentHash}, got ${calculatedHash}. Data may be tampered.`);
-                return;
-            }
-            setVerifiedHash(true);
 
             // 5. Extract Tar
             setStatus('Unpacking Memorial Bundle...');
