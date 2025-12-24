@@ -475,6 +475,10 @@ export default function ViewMemorial() {
                                 <span className="text-slate-400 block mb-1 uppercase tracking-wider">Block Time</span>
                                 {rawTx?.status?.block_time ? new Date(rawTx.status.block_time * 1000).toLocaleString() : 'Unconfirmed'}
                             </p>
+                            <p>
+                                <span className="text-slate-400 block mb-1 uppercase tracking-wider">Block Height</span>
+                                {rawTx?.status?.block_height ? rawTx.status.block_height.toLocaleString() : 'Pending'}
+                            </p>
                         </div>
                     </div>
                     <div>
