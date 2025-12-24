@@ -35,7 +35,7 @@ export async function createInvoice(request: PaymentRequest) {
     };
 }
 
-export async function checkPaymentStatus(paymentId: string): Promise<PaymentStatus> {
+export async function checkPaymentStatus(paymentId: string): Promise<{ status: PaymentStatus, txid?: string }> {
     const payment = await prisma.payment.findUnique({
         where: { id: paymentId },
         include: { memorial: true }
@@ -43,17 +43,24 @@ export async function checkPaymentStatus(paymentId: string): Promise<PaymentStat
 
     if (!payment) throw new Error('Payment not found');
 
-    if (!payment.providerId) {
-        return payment.status as PaymentStatus;
+    // If already completed in DB, return it (with TXID if available)
+    if (payment.status === 'COMPLETED') {
+        return {
+            status: 'COMPLETED',
+            txid: payment.memorial.txid || undefined
+        };
     }
 
-    // Always check real status from BTCPay (which handles mock fallback internally)
+    if (!payment.providerId) {
+        return { status: payment.status as PaymentStatus };
+    }
+
+    // Always check real status from BTCPay
     const btcPayStatus = await getBtcPayStatus(payment.providerId);
 
     let newStatus: PaymentStatus = 'PENDING';
 
     // Map BTCPay status to our internal status
-    // BTCPay: New, Processing, Settled, Invalid, Expired
     console.log(`[Payment] Mapping BTCPay status: ${btcPayStatus}`);
     switch (btcPayStatus) {
         case 'Settled':
@@ -69,7 +76,7 @@ export async function checkPaymentStatus(paymentId: string): Promise<PaymentStat
             newStatus = 'PENDING';
     }
 
-    // If status changed to COMPLETED, update DB
+    // If status changed to COMPLETED, update DB and Anchor
     if (newStatus === 'COMPLETED' && payment.status !== 'COMPLETED') {
         const txid = await anchorMemorial(payment.memorialId);
 
@@ -87,8 +94,17 @@ export async function checkPaymentStatus(paymentId: string): Promise<PaymentStat
                 }
             })
         ]);
-        return 'COMPLETED';
+        return { status: 'COMPLETED', txid };
     }
 
-    return newStatus;
+    // If FAILED, update DB but don't anchor
+    if (newStatus === 'FAILED' && payment.status !== 'FAILED') {
+        await prisma.payment.update({
+            where: { id: paymentId },
+            data: { status: 'FAILED' }
+        });
+        return { status: 'FAILED' };
+    }
+
+    return { status: newStatus };
 }

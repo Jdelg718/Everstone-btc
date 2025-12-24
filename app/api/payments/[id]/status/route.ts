@@ -7,8 +7,8 @@ export async function GET(
 ) {
     try {
         const id = (await params).id;
-        const status = await checkPaymentStatus(id);
-        return NextResponse.json({ status });
+        const result = await checkPaymentStatus(id);
+        return NextResponse.json(result);
     } catch (error) {
         return NextResponse.json({ error: 'Not Found' }, { status: 404 });
     }
