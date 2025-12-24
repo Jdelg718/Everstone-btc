@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { decodePayload, STORAGE_TYPES } from '@/lib/protocol';
 import JSZip from 'jszip';
 import { Buffer } from 'buffer';
