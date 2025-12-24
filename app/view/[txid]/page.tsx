@@ -30,6 +30,7 @@ export default function ViewMemorial() {
     const [verifiedHash, setVerifiedHash] = useState<boolean>(false);
     const [onChainHash, setOnChainHash] = useState<string>('');
     const [rawTx, setRawTx] = useState<any>(null);
+    const [downloadSlug, setDownloadSlug] = useState<string>('');
 
     useEffect(() => {
         if (!txid) return;
@@ -46,6 +47,7 @@ export default function ViewMemorial() {
 
             // --- MOCK / SIMNET HANDLING ---
             if (id.startsWith('mock-')) {
+                setDownloadSlug('mock');
                 setStatus('Simulating Bitcoin Block Verification...');
                 // Artificial delay for effect
                 await new Promise(r => setTimeout(r, 1500));
@@ -106,6 +108,7 @@ export default function ViewMemorial() {
             if (payloadAscii.startsWith('EVST1:') && !payloadAscii.includes('\0')) {
                 isServiceMode = true;
                 slugFromPayload = payloadAscii.substring(6); // remove EVST1:
+                setDownloadSlug(slugFromPayload);
                 console.log("Detected Service Mode Anchor for:", slugFromPayload);
             } else {
                 // Try Binary Decode
