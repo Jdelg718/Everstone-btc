@@ -159,7 +159,6 @@ export default function ViewMemorial() {
 
             if (!isServiceMode && protocol) {
                 const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
                 const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
                 if (calculatedHash !== protocol.contentHash) {
@@ -173,9 +172,7 @@ export default function ViewMemorial() {
                 // We don't have an on-chain hash to compare against, 
                 // but we confirmed the TX exists and anchors this ID.
                 // We can calculate the hash of what we got for display purposes
-                const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                setOnChainHash(hashArray.map(b => b.toString(16).padStart(2, '0')).join(''));
+                // This is now handled by the `if (!onChainHash)` block above.
             }
 
             // 5. Extract Bundle (ZIP)
@@ -185,6 +182,7 @@ export default function ViewMemorial() {
             // Handle ZIP format (Service Mode uses ZIP)
             try {
                 const zip = await JSZip.loadAsync(arrayBuffer);
+                console.log("ZIP Loaded. Files:", Object.keys(zip.files));
 
                 const assets: Record<string, string> = {};
                 let meta: any = null;
@@ -196,8 +194,10 @@ export default function ViewMemorial() {
                     // heuristic: check for metadata.json at root or in folder
                     if (relativePath.endsWith('metadata.json')) {
                         const text = await zipEntry.async('string');
+                        console.log("Found metadata.json:", text);
                         try {
                             meta = JSON.parse(text);
+                            console.log("Parsed Metadata Object:", meta);
                         } catch (e) {
                             console.error("Failed to parse metadata JSON", e);
                         }
