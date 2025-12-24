@@ -120,16 +120,26 @@ export default function MemorialClient({ initialMemorial }: MemorialClientProps)
                             It has been cryptographically secured on the Bitcoin blockchain using the Everstone Protocol.
                         </p>
 
-                        <a
-                            href={`/view/${memorial.txid || ''}`}
-                            className="inline-flex items-center gap-2 px-8 py-3 bg-slate-800 text-green-400 border border-green-500/30 font-bold rounded hover:bg-slate-700 transition-colors mb-8"
-                        >
-                            <ShieldCheck className="w-5 h-5" />
-                            View Verification
-                        </a>
+                        <div className="flex flex-col gap-4 mb-8">
+                            <a
+                                href={`/view/${memorial.txid || ''}`}
+                                className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-slate-800 text-green-400 border border-green-500/30 font-bold rounded hover:bg-slate-700 transition-colors"
+                            >
+                                <ShieldCheck className="w-5 h-5" />
+                                View Verification
+                            </a>
+
+                            <a
+                                href={`/api/memorials/${memorial.slug}/download`}
+                                className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[var(--accent-gold)] text-slate-900 font-bold rounded hover:bg-yellow-500 transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                Download Offline Bundle
+                            </a>
+                        </div>
 
                         <div className="max-w-md mx-auto pt-8 border-t border-slate-800">
-                            <h4 className="text-slate-400 font-serif mb-4">Get your ownership bundle</h4>
+                            <h4 className="text-slate-400 font-serif mb-4">Email Receipt</h4>
                             <form
                                 onSubmit={async (e) => {
                                     e.preventDefault();
@@ -219,7 +229,7 @@ export default function MemorialClient({ initialMemorial }: MemorialClientProps)
                             className="inline-flex items-center gap-2 px-8 py-3 bg-[var(--accent-gold)] text-slate-900 font-bold rounded hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                            Anchor to Bitcoin (Simnet)
+                            Anchor to Bitcoin
                         </button>
                     </>
                 )}
