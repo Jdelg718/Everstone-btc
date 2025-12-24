@@ -41,22 +41,7 @@ export default function MemorialClient({ initialMemorial }: MemorialClientProps)
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-[var(--accent-gold)] selection:text-slate-900">
-            {/* Header */}
-            <div className={`bg-slate-900 border-b ${isAnchored ? 'border-green-900/30' : 'border-yellow-900/30'} py-3 px-6 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-80`}>
-                <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
-                    <div className={`w-8 h-8 border ${isAnchored ? 'border-green-500/50' : 'border-yellow-500/50'} flex items-center justify-center transform rotate-45`}>
-                        <span className={`transform -rotate-45 ${isAnchored ? 'text-green-500' : 'text-yellow-500'} font-bold text-xs`}>E</span>
-                    </div>
-                    <span className="font-serif ml-2 hidden sm:block text-slate-300">Everstone Viewer</span>
-                </div>
-
-                <div className={`flex items-center gap-3 ${isAnchored ? 'bg-green-900/20 border-green-700/50' : 'bg-yellow-900/20 border-yellow-700/50'} border px-4 py-1.5 rounded-full`}>
-                    <div className={`w-2 h-2 rounded-full ${isAnchored ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`} />
-                    <span className={`text-xs font-bold ${isAnchored ? 'text-green-500' : 'text-yellow-500'} uppercase tracking-wider leading-none`}>
-                        {isAnchored ? 'Anchored Immutable' : 'Draft Preview'}
-                    </span>
-                </div>
-            </div>
+            {/* Header removed (handled by layout) */}
 
             {/* Hero Section */}
             <div className="relative w-full h-[60vh] md:h-[70vh]">

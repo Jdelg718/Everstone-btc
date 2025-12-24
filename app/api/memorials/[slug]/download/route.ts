@@ -25,7 +25,7 @@ export async function GET(
         const zipBuffer = await generateMemorialPackage(memorial);
 
         // HOTFIX: Inject content for Claude Shannon if missing (due to DB split-brain)
-        if (memorial.id === 'cmjjb9d1e0000zwsyrnp5fxkv' && (!memorial.bio || memorial.bio.length < 10)) {
+        if (memorial.id === 'cmjjb9d1e0000zwsyrnp5fxkv' && (!memorial.mainImage || !memorial.bio || memorial.bio.length < 10)) {
             console.log("Applying Hotfix for Shannon data...");
             memorial.bio = `Claude Elwood Shannon (April 30, 1916 – February 24, 2001) was an American mathematician, electrical engineer, and cryptographer known as "the father of information theory". Shannon is noted for having founded information theory with a landmark paper, "A Mathematical Theory of Communication", that he published in 1948. He is also well known for founding digital circuit design theory in 1937, when—as a 21-year-old master's degree student at the Massachusetts Institute of Technology (MIT)—he wrote his thesis demonstrating that electrical applications of boolean algebra could construct any logical numerical relationship.`;
             memorial.epitaph = "He proved that information has structure — and that secrecy can be measured.";
