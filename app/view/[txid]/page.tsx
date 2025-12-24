@@ -309,12 +309,67 @@ export default function ViewMemorial() {
                         <button className="mt-4 text-xs text-slate-500 hover:text-slate-300 underline" onClick={() => window.location.reload()}>Retry Automatic Fetch</button>
                     </div>
                 ) : (
-                    <>
+                    <div className="flex flex-col items-center">
                         <ShieldAlert className="w-16 h-16 text-red-500 mb-4" />
                         <h1 className="text-3xl font-serif text-red-400 mb-2">Verification Failed</h1>
                         <p className="text-slate-400 max-w-md">{error}</p>
-                        <button className="mt-8 px-6 py-2 bg-slate-800 rounded-full hover:bg-slate-700" onClick={() => window.location.reload()}>Try Again</button>
-                    </>
+
+                        <div className="mt-8 w-full max-w-xs border-t border-slate-800 pt-8">
+                            <p className="text-xs text-slate-500 mb-4">Have a bundle file? Verify it manually:</p>
+                            <label className="flex items-center justify-center gap-2 w-full cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-4 rounded transition-all border border-slate-700">
+                                <Upload className="w-4 h-4" />
+                                <span>Load Bundle (.zip)</span>
+                                <input
+                                    type="file"
+                                    accept=".zip"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = async (ev) => {
+                                                if (ev.target?.result) {
+                                                    try {
+                                                        const buf = ev.target.result as ArrayBuffer;
+                                                        setStatus('Verifying Manual Bundle...');
+
+                                                        const zip = await JSZip.loadAsync(buf);
+                                                        const assets: Record<string, string> = {};
+                                                        let meta: any = null;
+
+                                                        for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+                                                            if (zipEntry.dir) continue;
+                                                            if (relativePath.endsWith('metadata.json')) {
+                                                                const text = await zipEntry.async('string');
+                                                                try { meta = JSON.parse(text); } catch (e) { console.error(e); }
+                                                            } else {
+                                                                const blob = await zipEntry.async('blob');
+                                                                const cleanName = relativePath.replace(/^[^/]+\//, '');
+                                                                const objectUrl = URL.createObjectURL(blob);
+                                                                assets[cleanName] = objectUrl;
+                                                                assets[relativePath] = objectUrl;
+                                                            }
+                                                        }
+
+                                                        if (!meta) throw new Error('Invalid Bundle: metadata.json missing.');
+                                                        setMemorial({ metadata: meta, assets });
+                                                        setVerifiedHash(true);
+                                                        setError(null);
+                                                        setStatus('Ready');
+                                                    } catch (err: any) {
+                                                        alert("Failed to load bundle: " + err.message);
+                                                    }
+                                                }
+                                            };
+                                            reader.readAsArrayBuffer(file);
+                                        }
+                                    }}
+                                />
+                            </label>
+                        </div>
+
+                        <button className="mt-8 px-6 py-2 text-slate-500 text-xs hover:text-slate-300" onClick={() => window.location.reload()}>Retry Network Fetch</button>
+                    </div>
                 )}
             </div>
         );
