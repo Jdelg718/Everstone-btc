@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { decodePayload, STORAGE_TYPES } from '@/lib/protocol';
-import untar from 'js-untar';
+import JSZip from 'jszip';
 import { Buffer } from 'buffer';
 import { ShieldAlert, ShieldCheck, Loader2, Download } from 'lucide-react';
 
@@ -177,31 +177,49 @@ export default function ViewMemorial() {
                 setOnChainHash(hashArray.map(b => b.toString(16).padStart(2, '0')).join(''));
             }
 
-            // 5. Extract Tar
+            // 5. Extract Bundle (ZIP)
             setStatus('Unpacking Memorial Bundle...');
-            const files = await untar(arrayBuffer);
 
-            // Process Files
-            const assets: Record<string, string> = {};
-            let meta: any = null;
+            let files: any[] = [];
+            // Handle ZIP format (Service Mode uses ZIP)
+            try {
+                const zip = await JSZip.loadAsync(arrayBuffer);
 
-            for (const file of files) {
-                // Normalize path (handle root folder if present)
-                // e.g. "folder/metadata.json" -> "metadata.json"
-                // heuristic: if ends with metadata.json, it's the meta.
-                if (file.name.endsWith('metadata.json')) {
-                    const text = await file.readAsString();
-                    meta = JSON.parse(text);
-                } else {
-                    // It's an asset (image/video)
-                    // Create object URL
-                    // We need to map "assets/photo.jpg" -> blobUrl
-                    // If the tar has a root dir, strip it.
-                    const cleanName = file.name.replace(/^[^/]+\//, ''); // strip first dir
-                    assets[cleanName] = URL.createObjectURL(file.blob);
-                    // Also keep original name just in case
-                    assets[file.name] = URL.createObjectURL(file.blob);
+                const assets: Record<string, string> = {};
+                let meta: any = null;
+
+                // Process files
+                for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+                    if (zipEntry.dir) continue;
+
+                    // heuristic: check for metadata.json at root or in folder
+                    if (relativePath.endsWith('metadata.json')) {
+                        const text = await zipEntry.async('string');
+                        try {
+                            meta = JSON.parse(text);
+                        } catch (e) {
+                            console.error("Failed to parse metadata JSON", e);
+                        }
+                    } else {
+                        // It's an asset
+                        const blob = await zipEntry.async('blob');
+                        const cleanName = relativePath.replace(/^[^/]+\//, '');
+                        const objectUrl = URL.createObjectURL(blob);
+                        assets[cleanName] = objectUrl;
+                        assets[relativePath] = objectUrl; // keep original path too
+                    }
                 }
+
+                if (!meta) throw new Error('Invalid Bundle: metadata.json missing.');
+                setMemorial({ metadata: meta, assets });
+                setStatus('Ready');
+                return;
+
+            } catch (zipError) {
+                console.warn("ZIP extraction failed, trying TAR fallback...", zipError);
+                // Fallback to untar (for legacy support if needed, though likely not)
+                // We'll throw for now as we know it's ZIP
+                throw new Error('Failed to unpack bundle (Invalid ZIP format)');
             }
 
             if (!meta) throw new Error('Invalid Bundle: metadata.json missing.');
