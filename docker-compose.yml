@@ -15,6 +15,7 @@ services:
       - BTCPAY_URL=${BTCPAY_URL}
       - BTCPAY_API_KEY=${BTCPAY_API_KEY}
       - BTCPAY_STORE_ID=${BTCPAY_STORE_ID}
+      - TREASURY_WIF=${TREASURY_WIF}
     volumes:
       # Use a named volume for better permission management
       - everstone_db:/app/prisma/db
