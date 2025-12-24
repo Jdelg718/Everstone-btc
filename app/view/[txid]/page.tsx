@@ -404,6 +404,6 @@ export default function ViewMemorial() {
                 </div>
             </div>
         </div>
-        </div >
+
     );
 }
