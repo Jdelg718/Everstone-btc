@@ -320,11 +320,17 @@ export default function ViewMemorial() {
                     <>
                         <img
                             src={mainImageSrc}
-                            className="absolute inset-0 w-full h-full object-cover opacity-50"
+                            className="absolute inset-0 w-full h-full object-cover"
                             alt="Main Memorial"
+                            onError={(e) => {
+                                console.error("Image Failed to Load:", mainImageSrc);
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                alert(`Failed to load image: ${mainImageSrc}`);
+                            }}
+                            onLoad={() => console.log("Image Loaded Successfully:", mainImageSrc)}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950/80" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950/80" />
                     </>
                 )}
 
