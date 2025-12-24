@@ -262,24 +262,39 @@ export default function ViewMemorial() {
         // Easiest is to trigger the download URL again if Service Mode.
 
         try {
-            // For Service Mode, we can just point to the API
-            const slugFromPayload = txid.startsWith('mock-') ? 'mock' :
-                (rawTx?.vout?.find((o: any) => o.scriptpubkey.includes('4556535431'))?.scriptpubkey?.substring(10)?.split(':')?.[1] || '');
+            // Robust retrieval of slug for Service Mode
+            // 1. Try state if set
+            let slug = downloadSlug;
 
-            // Re-download for user
-            // We can just create a link to the API for Service Mode
-            // Or if we have the data, re-zip?
-            // Let's use the API link for now as it's cleaner
-            if (slugFromPayload) {
-                window.open(`/api/memorials/${slugFromPayload}/download`, '_blank');
+            // 2. If not, try to parse from rawTx (Service Mode: EVST1:slug)
+            if (!slug && rawTx) {
+                const opReturn = rawTx.vout?.find((o: any) => o.scriptpubkey.startsWith('6a'));
+                if (opReturn) {
+                    const script = opReturn.scriptpubkey;
+                    const markerIndex = script.indexOf('4556535431');
+                    if (markerIndex !== -1) {
+                        const payloadAscii = Buffer.from(script.substring(markerIndex), 'hex').toString('utf-8');
+                        if (payloadAscii.startsWith('EVST1:')) {
+                            slug = payloadAscii.substring(6);
+                        }
+                    }
+                }
+            }
+
+            // 3. Last resort: Mock
+            if (!slug && txid.startsWith('mock-')) slug = 'mock';
+
+            if (slug) {
+                const url = `/api/memorials/${slug}/download`;
+                console.log("Downloading from:", url);
+                window.location.href = url; // Use location.href for reliable download trigger
                 return;
             }
 
-            // Fallback for IPFS/Arweave (not fully implemented download-from-client)
-            alert("Download not available in this preview mode.");
+            alert("Download bundle not available (ID not found).");
         } catch (e) {
-            console.error(e);
-            alert("Download failed.");
+            console.error("Download Error:", e);
+            alert("Download failed: " + (e as Error).message);
         }
     };
 
