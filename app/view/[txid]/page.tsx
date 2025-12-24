@@ -301,31 +301,18 @@ export default function ViewMemorial() {
     const { metadata, assets } = memorial;
     let mainImageSrc = assets[metadata.content.mainImage] || assets[`assets/${metadata.content.mainImage}`];
 
-    // Fallback for Service Mode (External URLs)
-    if (!mainImageSrc && metadata.content.mainImage && (metadata.content.mainImage.startsWith('http') || metadata.content.mainImage.startsWith('/'))) {
-        mainImageSrc = metadata.content.mainImage;
+    // Fallback for Service Mode (External URLs) - Simplified
+    if (!mainImageSrc && metadata.content.mainImage) {
+        const rawUrl = metadata.content.mainImage.trim();
+        if (rawUrl.startsWith('http') || rawUrl.startsWith('/')) {
+            console.log("Using external image URL:", rawUrl);
+            mainImageSrc = rawUrl;
+        }
     }
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-[var(--accent-gold)] selection:text-slate-900">
-            {/* Header */}
-            <nav className="border-b border-slate-800 bg-slate-950/80 backdrop-blur fixed w-full z-50">
-                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 bg-gradient-to-br from-[var(--accent-gold)] to-yellow-600 rotate-45 group-hover:rotate-0 transition-transform duration-500 flex items-center justify-center">
-                            <span className="text-slate-900 font-serif font-bold text-xl -rotate-45 group-hover:rotate-0 transition-transform duration-500">B</span>
-                        </div>
-                        <span className="font-serif text-xl tracking-tight text-slate-200 group-hover:text-[var(--accent-gold)] transition-colors">Everstone<span className="text-[var(--accent-gold)]">BTC</span></span>
-                    </Link>
-                    <div className="flex items-center gap-6 text-sm font-medium text-slate-400">
-                        <Link href="/explore" className="hover:text-[var(--accent-gold)] transition-colors">Explore</Link>
-                        <Link href="/technology" className="hover:text-[var(--accent-gold)] transition-colors">Technology</Link>
-                        <Link href="/#how-it-works" className="hover:text-[var(--accent-gold)] transition-colors">How it Works</Link>
-                        <Link href="/sample" className="hover:text-[var(--accent-gold)] transition-colors">Sample</Link>
-                        <Link href="/create" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-[var(--accent-gold)] rounded-full transition-colors border border-slate-700">Create Memorial</Link>
-                    </div>
-                </div>
-            </nav>
+            {/* Header removed (handled by layout) */}
 
             {/* Hero Section */}
             <div className="relative w-full min-h-[60vh] md:min-h-[70vh] flex items-center justify-center pt-24">
