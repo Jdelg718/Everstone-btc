@@ -5,22 +5,27 @@ export async function generateMemorialPackage(memorial: Memorial) {
     const zip = new JSZip();
 
     // 1. Add Data
+    // 1. Add Data (Formatted for Viewer)
     const data = {
-        meta: {
-            title: `Memorial for ${memorial.fullName}`,
-            exportedAt: new Date().toISOString(),
-            version: "1.0.0",
-            proof: memorial.txid ? {
-                txid: memorial.txid,
-                explorer: `https://mempool.space/tx/${memorial.txid}`
-            } : null
+        subject: {
+            fullName: memorial.fullName,
+            birthDate: memorial.birthDate,
+            deathDate: memorial.deathDate,
+            epitaph: memorial.epitaph
         },
-        memorial: {
-            ...memorial,
-            gallery: typeof memorial.gallery === 'string' ? JSON.parse(memorial.gallery) : memorial.gallery
+        content: {
+            bioMarkdown: memorial.bio,
+            mainImage: memorial.mainImage,
+            gallery: typeof memorial.gallery === 'string' ? JSON.parse(memorial.gallery || '[]') : memorial.gallery
+        },
+        provenance: {
+            version: "1.0.0",
+            exportedAt: new Date().toISOString(),
+            txid: memorial.txid,
+            explorer: memorial.txid ? `https://mempool.space/tx/${memorial.txid}` : null
         }
     };
-    zip.file('memorial.json', JSON.stringify(data, null, 2));
+    zip.file('metadata.json', JSON.stringify(data, null, 2));
 
     // 2. Add Readme
     zip.file('README.txt', `EverstoneBTC - Digital Memorial
