@@ -1,8 +1,15 @@
-
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const http = require('http');
+const fs = require('fs');
+
+// Log file in executable directory
+const logPath = path.join(process.cwd(), 'app.log');
+
+function logToFile(msg) {
+    fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+}
 
 // Configuration
 const PORT = 34567;
@@ -13,37 +20,50 @@ let serverProcess;
 
 // 1. Start Next.js Standalone Server
 function startServer() {
-    if (IS_DEV) return; // In dev, we use the external "npm run dev" server
+    logToFile("startServer called");
+    if (IS_DEV) {
+        logToFile("In DEV mode, skipping server spawn");
+        return;
+    }
 
     // Use __dirname to find server.js relative to electron/main.js (which is at root/electron/main.js)
     // So server.js is at root/server.js => ../server.js
     const serverPath = path.join(__dirname, '..', 'server.js');
-    console.log("Starting Next.js Server at:", serverPath);
+    logToFile(`Target Server Path: ${serverPath}`);
 
-    if (!require('fs').existsSync(serverPath)) {
-        require('electron').dialog.showErrorBox('Error', 'Internal Server File Not Found: ' + serverPath);
+    if (!fs.existsSync(serverPath)) {
+        const errorMsg = 'Internal Server File Not Found: ' + serverPath;
+        logToFile(errorMsg);
+        require('electron').dialog.showErrorBox('Error', errorMsg);
         return;
     }
 
-    serverProcess = spawn('node', [serverPath], {
-        env: {
-            ...process.env,
-            PORT: PORT,
-            HOSTNAME: 'localhost',
-            NODE_ENV: 'production'
-        },
-        cwd: path.dirname(serverPath)
-    });
+    logToFile("Spawning node process...");
+    try {
+        serverProcess = spawn('node', [serverPath], {
+            env: {
+                ...process.env,
+                PORT: PORT,
+                HOSTNAME: 'localhost',
+                NODE_ENV: 'production'
+            },
+            cwd: path.dirname(serverPath)
+        });
 
-    serverProcess.stdout.on('data', (data) => console.log(`[Next]: ${data}`));
-    serverProcess.stderr.on('data', (data) => console.error(`[Next Err]: ${data}`));
+        serverProcess.stdout.on('data', (data) => logToFile(`[Next stdout]: ${data}`));
+        serverProcess.stderr.on('data', (data) => logToFile(`[Next stderr]: ${data}`));
 
-    serverProcess.on('exit', (code) => {
-        if (code !== 0 && code !== null) {
-            console.error(`Next.js server exited with code ${code}`);
-            // Only show if it crashes immediately
-        }
-    });
+        serverProcess.on('error', (err) => {
+            logToFile(`Failed to spawn server: ${err.message}`);
+            require('electron').dialog.showErrorBox('Server Error', `Failed to spawn: ${err.message}`);
+        });
+
+        serverProcess.on('exit', (code) => {
+            logToFile(`Next.js server exited with code ${code}`);
+        });
+    } catch (e) {
+        logToFile(`Exception spawning server: ${e.message}`);
+    }
 }
 
 function checkServerOnline(retries = 20) {
@@ -92,6 +112,7 @@ async function createWindow() {
 }
 
 app.whenReady().then(() => {
+    logToFile("App Ready");
     startServer();
     createWindow();
 
