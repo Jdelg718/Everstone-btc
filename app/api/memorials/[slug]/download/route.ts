@@ -7,8 +7,15 @@ export async function GET(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const slug = (await params).slug;
-        const memorial = await prisma.memorial.findUnique({ where: { slug } });
+        const slugOrId = (await params).slug;
+        const memorial = await prisma.memorial.findFirst({
+            where: {
+                OR: [
+                    { slug: slugOrId },
+                    { id: slugOrId }
+                ]
+            }
+        });
 
         if (!memorial) {
             return new NextResponse('Memorial not found', { status: 404 });
@@ -19,7 +26,7 @@ export async function GET(
         return new NextResponse(zipBuffer as any, {
             headers: {
                 'Content-Type': 'application/zip',
-                'Content-Disposition': `attachment; filename="memorial-${slug}.zip"`
+                'Content-Disposition': `attachment; filename="memorial-${memorial.slug}.zip"`
             }
         });
 
