@@ -222,10 +222,6 @@ export default function ViewMemorial() {
                 throw new Error('Failed to unpack bundle (Invalid ZIP format)');
             }
 
-            if (!meta) throw new Error('Invalid Bundle: metadata.json missing.');
-            setMemorial({ metadata: meta, assets });
-            setStatus('Ready');
-
         } catch (err: any) {
             setError(err.message);
             setStatus('Failed');
