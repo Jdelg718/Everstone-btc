@@ -19,6 +19,7 @@ export interface Memorial {
     // Add missing fields for TS
     paymentStatus?: string;
     txid?: string | null;
+    blockHeight?: number | null;
 }
 
 interface MemorialClientProps {
@@ -101,9 +102,50 @@ export default function MemorialClient({ initialMemorial }: MemorialClientProps)
                 {isAnchored ? (
                     <>
                         <h3 className="text-green-400 font-serif text-lg mb-4">This memorial is permanently anchored</h3>
-                        <p className="text-slate-500 max-w-lg mx-auto mb-8">
+                        <p className="text-slate-500 max-w-lg mx-auto mb-6">
                             It has been cryptographically secured on the Bitcoin blockchain using the Everstone Protocol.
                         </p>
+
+                        {/* Blockchain Verification Badge */}
+                        {memorial.txid && (
+                            <div className="max-w-2xl mx-auto mb-8 border border-green-500/30 bg-slate-800/50 rounded-lg p-6">
+                                <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-slate-400">🔗 Block</span>
+                                        {memorial.blockHeight ? (
+                                            <a
+                                                href={`https://mempool.space/block/${memorial.blockHeight}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-green-400 font-mono font-bold hover:text-green-300 transition-colors"
+                                            >
+                                                #{memorial.blockHeight.toLocaleString()}
+                                            </a>
+                                        ) : (
+                                            <span className="text-slate-500 font-mono">Pending...</span>
+                                        )}
+                                    </div>
+                                    <span className="text-slate-600 hidden md:inline">•</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-slate-400">TX:</span>
+                                        <a
+                                            href={`https://mempool.space/tx/${memorial.txid}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-green-400 font-mono text-xs hover:text-green-300 transition-colors"
+                                            title={memorial.txid}
+                                        >
+                                            {memorial.txid.slice(0, 6)}...{memorial.txid.slice(-6)} ↗
+                                        </a>
+                                    </div>
+                                </div>
+                                {memorial.blockHeight && (
+                                    <div className="mt-3 text-xs text-slate-500">
+                                        Verified on Bitcoin blockchain
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         <div className="flex flex-col gap-4 mb-8">
                             <a

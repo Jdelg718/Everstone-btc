@@ -26,6 +26,7 @@ model Memorial {
   
   // Blockchain Anchor
   txid        String?  @unique
+  blockHeight Int?     // Bitcoin block number where tx was confirmed
   status      String   @default("DRAFT") // DRAFT, PENDING, ANCHORED
   anchoringPriority String @default("standard") // standard, fast, instant
   isPublic          Boolean @default(false)
