@@ -1,7 +1,7 @@
 # Everstone Development Roadmap
 
 > **Last Updated:** January 10, 2026
-> **Status:** Phase 1 Complete ✅ | Phase 2 Ready to Begin
+> **Status:** Phase 1 Complete ✅ | Phase 2 Complete ✅ | Phase 3 Ready to Begin
 
 ---
 
@@ -59,8 +59,8 @@ TX: f4184fc5...e9e16
 
 ---
 
-### Phase 2: Public Explorer API
-**Priority:** Medium | **Complexity:** Medium | **Est. Time:** 2-3 days
+### Phase 2: Public Explorer API ✅ COMPLETED
+**Priority:** Medium | **Complexity:** Medium | **Completed:** January 10, 2026
 
 Create a public API for third-party sites to display and link to Everstone memorials.
 
@@ -72,12 +72,18 @@ Create a public API for third-party sites to display and link to Everstone memor
 | `/api/v1/memorials/by-txid/{txid}` | GET | Lookup by transaction ID |
 
 #### Tasks
-- [ ] Create `/api/v1/memorials/route.ts` (list endpoint)
-- [ ] Create `/api/v1/memorials/[slug]/route.ts` (detail endpoint)
-- [ ] Create `/api/v1/memorials/by-txid/[txid]/route.ts`
-- [ ] Add rate limiting headers
-- [ ] Write API documentation page
-- [ ] Add CORS headers for third-party access
+- [x] Create `/api/v1/memorials/route.ts` (list endpoint)
+- [x] Create `/api/v1/memorials/[slug]/route.ts` (detail endpoint)
+- [x] Create `/api/v1/memorials/by-txid/[txid]/route.ts`
+- [x] Add rate limiting headers
+- [x] Write API documentation page (`/api-docs`)
+- [x] Add CORS headers for third-party access
+
+#### Implementation Details
+- **Utility Library**: Created `lib/api-utils.ts` with CORS, rate-limit headers, and response helpers
+- **Privacy**: Only returns `isPublic: true` AND `status: ANCHORED` memorials
+- **Documentation**: Interactive API docs at `/api-docs`
+- **Pagination**: Supports `?page=1&limit=20&order=desc` query params
 
 ---
 
@@ -254,7 +260,7 @@ Add trust-building elements:
 | Week | Focus | Deliverables | Status |
 |------|-------|--------------|--------|
 | 1 | Block Height Display | Feature complete, deployed | ✅ Complete |
-| 2 | Public API | Endpoints live, docs published | 🔜 Next |
+| 2 | Public API | Endpoints live, docs published | ✅ Complete |
 | 3-4 | Encrypted Messages | Core encryption, create flow | 📋 Planned |
 | 5 | Encrypted Messages | View/decrypt flow, polish | 📋 Planned |
 | 6 | Beautification | Animations, mobile, gallery | 📋 Planned |
