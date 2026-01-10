@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     siteName: "EverstoneBTC",
     images: [
       {
-        url: "/images/bitcoin.svg", // Using existing asset for now, user can update later
-        width: 800,
-        height: 600,
-        alt: "EverstoneBTC Logo",
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "EverstoneBTC - Digital Memorials on Bitcoin",
       },
     ],
     locale: "en_US",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Everstone - Digital Memorials on Bitcoin",
     description: "Etch their memory into eternity. Unstoppable, decentralized, and permanent digital memorials.",
-    images: ["/images/bitcoin.svg"], // Using existing asset for now
+    images: ["/images/og-image.png"],
   },
 };
 
