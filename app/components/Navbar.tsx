@@ -63,6 +63,21 @@ export default function Navbar() {
                         className="fixed inset-0 z-[55] pt-24 px-6 md:hidden flex flex-col gap-6"
                         style={{ backgroundColor: '#000000' }}
                     >
+                        {/* Mobile Logo - Home Button */}
+                        <Link
+                            href="/"
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-3 mb-4"
+                        >
+                            <div className="relative w-10 h-10 flex items-center justify-center">
+                                <div className="absolute inset-0 border border-[var(--accent-gold)] transform rotate-45"></div>
+                                <Bitcoin className="relative z-10 w-6 h-6 text-[var(--accent-gold)]" />
+                            </div>
+                            <span className="text-xl font-serif font-bold tracking-tight text-white">
+                                Everstone<span className="text-[var(--accent-gold)]">BTC</span>
+                            </span>
+                        </Link>
+
                         <nav className="flex flex-col gap-6 text-xl">
                             <MobileNavLink href="/explore" onClick={() => setIsOpen(false)}>Explore</MobileNavLink>
                             <MobileNavLink href="/technology" onClick={() => setIsOpen(false)}>Technology</MobileNavLink>
