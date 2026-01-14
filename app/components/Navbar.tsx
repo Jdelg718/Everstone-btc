@@ -55,7 +55,7 @@ export default function Navbar() {
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="fixed inset-0 bg-stone-950/95 backdrop-blur-xl pt-24 px-6 md:hidden flex flex-col gap-6"
+                            className="fixed inset-0 bg-stone-950 pt-24 px-6 md:hidden flex flex-col gap-6"
                         >
                             <nav className="flex flex-col gap-6 text-xl">
                                 <MobileNavLink href="/explore" onClick={() => setIsOpen(false)}>Explore</MobileNavLink>
